@@ -4,35 +4,43 @@ from configparser import ConfigParser
 from datetime import timedelta
 from logging import getLogger
 
-# package
-from GeminiTrader import GeminiTrader
+ACTION = "action"
+BUY = "BUY"
+SELL = "SELL"
+STOP = "stop"
+STRATEGY = "strategy"
+PERIOD = "period"
+AMOUNT = "amount"
+USD = "USD"
+BTC = "BTC"
 
 log = getLogger("gemini-trader")
 
 
-class ConfigMixin:
-    self: GeminiTrader
-
+class Configuration:
     def update_configuration(self):
         def update_action():
-            action = config.get("action", None)
+            action = config.get(ACTION, None)
 
-            if self.config.get("action") != action:
-                self.config.update({"action": action})
+            if self.config.get(ACTION) != action:
+                self.changes.append(ACTION)
+                self.config.update({ACTION: action})
                 log.info(f"Changed action to {action}")
 
         def update_stop():
-            stop = config.get("stop", None)
+            stop = config.get(STOP, None)
 
-            if self.config.get("stop") != stop:
-                self.config.update({"stop": stop})
+            if self.config.get(STOP) != stop:
+                self.changes.append(STOP)
+                self.config.update({STOP: stop})
                 log.info(f"Changed stop value to {stop}")
 
         def update_strategy():
-            strategy = config.get("strategy", None)
+            strategy = config.get(STRATEGY, None)
 
-            if self.config.get("strategy") != strategy:
-                self.config.update({"strategy": strategy})
+            if self.config.get(STRATEGY) != strategy:
+                self.changes.append(STRATEGY)
+                self.config.update({STRATEGY: strategy})
                 log.info(f"Changed strategy to {strategy}")
 
         def update_period():
@@ -106,17 +114,19 @@ class ConfigMixin:
 
                 return period
 
-            period = parse(config.get("period", None))
+            period = parse(config.get(PERIOD, None))
 
-            if self.config.get("period") != period:
-                self.config.update({"period": period})
+            if self.config.get(PERIOD) != period:
+                self.changes.append(PERIOD)
+                self.config.update({PERIOD: period})
                 log.info(f"Changed stategy period to {period}")
 
         def update_amount():
-            amount = config.get("amount", None)
+            amount = config.get(AMOUNT, None)
 
-            if self.config.get("amount") != amount:
-                self.config.update({"amount": amount})
+            if self.config.get(AMOUNT) != amount:
+                self.changes.append(AMOUNT)
+                self.config.update({AMOUNT: amount})
                 log.info(f"Changed amount to {amount}")
 
         config = ConfigParser()
@@ -125,6 +135,7 @@ class ConfigMixin:
 
         log.debug(f"Current configuration: {self.config}")
 
+        self.changes = []
         update_action()
         update_stop()
         update_strategy()
