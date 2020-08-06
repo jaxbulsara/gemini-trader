@@ -24,18 +24,19 @@ class GeminiTrader:
         self.account_balances = dict()
         self.bitcoin_quote = dict()
         self.cycle_start_time = None
+        self.retry_time = 2
 
     def run(self):
         self.login()
 
         self.read_configuration()
+        self.fetch_account_balances()
+        self.fetch_bitcoin_quote()
         self.create_strategy()
 
         while True:
             try:
                 self.set_cycle_start_time()
-                self.fetch_account_balances()
-                self.fetch_bitcoin_quote()
                 self.strategy.run()
 
             except requests.exceptions.ConnectionError:
@@ -51,7 +52,8 @@ class GeminiTrader:
 
     def login(self):
         with open(constants.KEYS_FILE, "r") as keys_file:
-            keys = json.load(keys_file)
+            keys_json = json.load(keys_file)
+            keys = (keys_json["api_key"], keys_json["secret_key"])
 
         while not self.gemini:
             try:
@@ -67,6 +69,8 @@ class GeminiTrader:
             else:
                 self.reset_retry_time()
                 log.debug(f"Logged in to gemini at url={self.gemini.base_url}")
+                # log.debug(f"{self.gemini.api_key=}")
+                # log.debug(f"{self.gemini.secret_key=}")
 
     def read_configuration(self):
         def convert_period():
@@ -143,6 +147,7 @@ class GeminiTrader:
 
     def set_cycle_start_time(self):
         self.cycle_start_time = datetime.now()
+        # log.debug(f"Updated cycle start time = {self.cycle_start_time}")
 
     def fetch_account_balances(self):
         account_balances = self.gemini.balances().json()
@@ -156,18 +161,21 @@ class GeminiTrader:
 
     def fetch_bitcoin_quote(self):
         bitcoin_quote = self.gemini.pubticker().json()
-        ask = float(bitcoin_quote.get("ask", None))
-        bid = float(bitcoin_quote.get("bid", None))
+        ask = float(bitcoin_quote.get(constants.ASK, None))
+        bid = float(bitcoin_quote.get(constants.BID, None))
         self.bitcoin_quote.update(
-            {"ask": ask, "bid": bid, "price": round((mean([ask, bid])), 2)}
+            {
+                constants.ASK: ask,
+                constants.BID: bid,
+                constants.PRICE: round((mean([ask, bid])), 2),
+            }
         )
 
         log.debug(f"Updated bitcoin quote: {self.bitcoin_quote}")
 
     def create_strategy(self):
         self.strategy = STRATEGIES[self.config["strategy"]](self)
-
-        log.debug(f"Created strategy object {self.strategy}")
+        log.debug(f"Running strategy: {self.config['strategy']}")
 
     def backoff_retry_time(self):
         self.retry_time *= 2
