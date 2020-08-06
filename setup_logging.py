@@ -16,7 +16,7 @@ def setup_logging(start_datetime, file=True, debug=False):
         "(%(name)s) %(asctime)s %(module)s %(levelname)s: %(message)s"
     )
     FILENAME = f"logs/{start_datetime}_gemini-trader.log"
-    VERBOSE_FILE = f"logs/{start_datetime}_gemini-trader_verbose.log"
+    VERBOSE_FILE = f"logs/verbose_{start_datetime}_gemini-trader.log"
 
     def create_logs_directory():
         if not os.path.isdir("logs"):
