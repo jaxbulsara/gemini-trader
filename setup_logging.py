@@ -11,7 +11,7 @@ from logging import (
 
 def setup_logging(start_datetime, file=True, debug=False):
     NAME = "gemini-trader"
-    FORMAT = "%(levelname)s: %(message)s"
+    FORMAT = "%(asctime)s %(levelname)s: %(message)s"
     VERBOSE_FORMAT = (
         "(%(name)s) %(asctime)s %(module)s %(levelname)s: %(message)s"
     )

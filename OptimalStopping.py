@@ -3,8 +3,8 @@ from statistics import mean
 from logging import getLogger
 
 # package
+import constants
 from Strategy import Strategy
-from Configuration import ACTION, PERIOD, AMOUNT, STOP, BUY, USD, BTC
 
 OPTIMAL_STOPPING = "OPTIMAL_STOPPING"
 STOPPING_FACTOR = 0.37
@@ -20,20 +20,23 @@ class OptimalStopping(Strategy):
         self.price_to_beat = None
         self.start_time = None
         self.switch_time = None
-        self.end_time = self.trader.current_time
+        self.end_time = self.trader.cycle_start_time
         self.retry_time = 2
         self.action = self.trader.config.get("action")
         self.amount = 0
 
-        self.initialize()
+        # self.initialize()
 
     def initialize(self):
         self.set_price_to_beat()
         self.start_time = self.end_time
         self.switch_time = (
-            self.start_time + self.trader.config.get(PERIOD) * STOPPING_FACTOR
+            self.start_time
+            + self.trader.config.get(constants.PERIOD) * STOPPING_FACTOR
         )
-        self.end_time = self.start_time + self.trader.config.get(PERIOD)
+        self.end_time = self.start_time + self.trader.config.get(
+            constants.PERIOD
+        )
         self.calculate_amount()
         log.debug("Initialized new cycle.")
 
@@ -45,7 +48,7 @@ class OptimalStopping(Strategy):
             log.debug(f"\tSwitch time = {self.switch_time}")
             log.debug(f"\tEnd time = {self.end_time}")
 
-            if self.trader.current_time < self.switch_time:
+            if self.trader.cycle_start_time < self.switch_time:
                 if self.compare_price():
                     self.set_price_to_beat()
                 else:
@@ -64,7 +67,7 @@ class OptimalStopping(Strategy):
                     log.debug(f"\tPrice to beat: {self.price_to_beat}")
 
                     if self.compare_price():
-                        if self.action == BUY:
+                        if self.action == constants.BUY:
                             bitcoin_amount = self.create_bitcoin_amount()
                         else:
                             bitcoin_amount = self.amount
@@ -85,7 +88,7 @@ class OptimalStopping(Strategy):
 
                         log.debug("Waiting for next trading window...")
 
-                if self.trader.current_time > self.end_time:
+                if self.trader.cycle_start_time > self.end_time:
                     self.initialize()
 
     def set_price_to_beat(self):
@@ -99,17 +102,17 @@ class OptimalStopping(Strategy):
         amount = float(self.trader.config.get("amount"))
         stop = float(self.trader.config.get("stop"))
 
-        if self.trader.config.get("action") == BUY:
-            balance = self.trader.account_balances.get(USD)
+        if self.trader.config.get("action") == constants.BUY:
+            balance = self.trader.account_balances.get(constants.USD)
         else:
-            balance = self.trader.account_balances.get(BTC)
+            balance = self.trader.account_balances.get(constants.BTC)
 
         if stop >= balance:
             self.amount = 0
         else:
             self.amount = min(amount, balance - stop)
 
-        if self.trader.config.get("action") == BUY:
+        if self.trader.config.get("action") == constants.BUY:
             log.debug(f"Set amount to buy = {self.amount} USD")
         else:
             log.debug(f"Set amount to sell = {self.amount} BTC")
@@ -120,22 +123,25 @@ class OptimalStopping(Strategy):
         return round((mean([ask, bid])), 2)
 
     def update(self):
-        if ACTION in self.trader.changes:
+        if constants.ACTION in self.trader.changes:
             self.action = self.trader.config.get("action")
-            self.end_time = self.trader.current_time
+            self.end_time = self.trader.cycle_start_time
             self.initialize()
 
-        elif PERIOD in self.trader.changes:
+        elif constants.PERIOD in self.trader.changes:
             self.recalculate_cycle()
 
-        if AMOUNT in self.trader.changes or STOP in self.trader.changes:
+        if (
+            constants.AMOUNT in self.trader.changes
+            or constants.STOP in self.trader.changes
+        ):
             self.amount = self.calculate_amount()
 
     def recalculate_cycle(self):
         pass
 
     def compare_price(self):
-        if self.action == BUY:
+        if self.action == constants.BUY:
             return self.get_mean_bitcoin_price() < self.price_to_beat
 
         else:
