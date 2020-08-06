@@ -175,7 +175,7 @@ class GeminiTrader:
 
     def create_strategy(self):
         self.strategy = STRATEGIES[self.config["strategy"]](self)
-        log.debug(f"Running strategy: {self.config['strategy']}")
+        log.info(f"Running strategy: {self.config['strategy']}")
 
     def backoff_retry_time(self):
         self.retry_time *= 2

@@ -24,13 +24,12 @@ class OptimalStopping(Strategy):
         self.amount = 0
 
     def initialize(self):
+        log.info("Initializing new cycle...")
         self.set_price_to_beat()
         self.set_start_time()
         self.set_switch_time()
         self.set_end_time()
         self.calculate_amount()
-
-        log.debug("Initialized new cycle.")
 
     def run(self):
         if self.amount:
@@ -84,7 +83,7 @@ class OptimalStopping(Strategy):
 
                     self.reset_price_to_beat()
 
-                    log.debug("Waiting for next trading window...")
+                    log.info("Waiting for next trading window...")
 
             if self.trader.cycle_start_time > self.end_time:
                 self.initialize()
@@ -92,7 +91,7 @@ class OptimalStopping(Strategy):
     def set_price_to_beat(self):
         bitcoin_price = self.trader.bitcoin_quote[constants.PRICE]
         self.price_to_beat = bitcoin_price
-        log.debug(f"Set new price to beat = {self.price_to_beat}")
+        log.info(f"Set new price to beat = {self.price_to_beat}")
 
     def reset_price_to_beat(self):
         self.price_to_beat = None
@@ -104,17 +103,17 @@ class OptimalStopping(Strategy):
         else:
             self.start_time = self.trader.cycle_start_time
 
-        log.debug(f"Set start time = {self.start_time}")
+        log.info(f"Set start time = {self.start_time}")
 
     def set_switch_time(self):
         period = self.trader.config[constants.PERIOD]
         self.switch_time = self.start_time + period * STOPPING_FACTOR
-        log.debug(f"Set switch time = {self.switch_time}")
+        log.info(f"Set switch time = {self.switch_time}")
 
     def set_end_time(self):
         period = self.trader.config[constants.PERIOD]
         self.end_time = self.start_time + period
-        log.debug(f"Set end time = {self.end_time}")
+        log.info(f"Set end time = {self.end_time}")
 
     def calculate_amount(self):
         self.trader.fetch_account_balances()
@@ -136,9 +135,9 @@ class OptimalStopping(Strategy):
             self.amount = min(amount, balance - stop_amount)
 
         if action == constants.BUY:
-            log.debug(f"Set amount to buy = {self.amount} {constants.USD}")
+            log.info(f"Set amount to buy = {self.amount} {constants.USD}")
         else:
-            log.debug(f"Set amount to sell = {self.amount} {constants.BTC}")
+            log.info(f"Set amount to sell = {self.amount} {constants.BTC}")
 
     def compare_price(self):
         bitcoin_price = self.trader.bitcoin_quote[constants.PRICE]
