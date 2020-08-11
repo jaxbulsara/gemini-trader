@@ -74,7 +74,7 @@ class GeminiTrader:
 
     def read_configuration(self):
         def convert_period():
-            self.config.get(constants.PERIOD) = timedelta(
+            self.config[constants.PERIOD] = timedelta(
                 seconds=self.config.get(constants.PERIOD)
             )
 
@@ -190,6 +190,7 @@ class GeminiTrader:
         time_since_start = current_time - self.cycle_start_time
 
         return (
-            self.config.get(constants.CYCLE_TIME) - time_since_start.total_seconds()
+            self.config.get(constants.CYCLE_TIME)
+            - time_since_start.total_seconds()
         )
 
