@@ -74,8 +74,8 @@ class GeminiTrader:
 
     def read_configuration(self):
         def convert_period():
-            self.config[constants.PERIOD] = timedelta(
-                seconds=self.config[constants.PERIOD]
+            self.config.get(constants.PERIOD) = timedelta(
+                seconds=self.config.get(constants.PERIOD)
             )
 
         def validate_configuration():
@@ -109,32 +109,32 @@ class GeminiTrader:
                     f"Configuration must contain a value for '{constants.STOP}'."
                 )
 
-            if self.config[constants.ACTION] not in constants.ACTIONS:
+            if self.config.get(constants.ACTION) not in constants.ACTIONS:
                 raise ValueError(f"Action must be one of {constants.ACTIONS}")
 
-            if self.config[constants.STRATEGY] not in STRATEGIES:
+            if self.config.get(constants.STRATEGY) not in STRATEGIES:
                 raise ValueError(
                     f"Strategy must be one of {set(STRATEGIES.keys())}"
                 )
 
-            if type(self.config[constants.PERIOD]) not in [int, float]:
+            if type(self.config.get(constants.PERIOD)) not in [int, float]:
                 raise TypeError(
-                    f"Period must be a value in seconds. Got {type(self.config[constants.PERIOD])}."
+                    f"Period must be a value in seconds. Got {type(self.config.get(constants.PERIOD))}."
                 )
 
-            if type(self.config[constants.CYCLE_TIME]) not in [int, float]:
+            if type(self.config.get(constants.CYCLE_TIME)) not in [int, float]:
                 raise TypeError(
-                    f"Cycle time must be a value in seconds. Got {type(self.config[constants.CYCLE_TIME])}."
+                    f"Cycle time must be a value in seconds. Got {type(self.config.get(constants.CYCLE_TIME))}."
                 )
 
-            if type(self.config[constants.AMOUNT]) not in [int, float]:
+            if type(self.config.get(constants.AMOUNT)) not in [int, float]:
                 raise TypeError(
-                    f"Amount to buy must be a value in USD or BTC. Got {type(self.config[constants.AMOUNT])}."
+                    f"Amount to buy must be a value in USD or BTC. Got {type(self.config.get(constants.AMOUNT, None))}."
                 )
 
-            if type(self.config[constants.STOP]) not in [int, float]:
+            if type(self.config.get(constants.STOP)) not in [int, float]:
                 raise TypeError(
-                    f"Stop amount must be a value in USD or BTC. Got {type(self.config[constants.STOP])}."
+                    f"Stop amount must be a value in USD or BTC. Got {type(self.config.get(constants.STOP, None))}."
                 )
 
         with open(constants.CONFIG_FILE, "r") as config_file:
@@ -157,12 +157,12 @@ class GeminiTrader:
             amount = float(balance.get("available"))
             self.account_balances.update({currency: amount})
 
-        log.debug(f"Updated account balances: {self.account_balances} USD")
+        log.debug(f"Updated account balances: {self.account_balances}")
 
     def fetch_bitcoin_quote(self):
         bitcoin_quote = self.gemini.pubticker().json()
-        ask = float(bitcoin_quote.get(constants.ASK, None))
-        bid = float(bitcoin_quote.get(constants.BID, None))
+        ask = float(bitcoin_quote.get(constants.ASK, 0))
+        bid = float(bitcoin_quote.get(constants.BID, 0))
         self.bitcoin_quote.update(
             {
                 constants.ASK: ask,
@@ -190,6 +190,6 @@ class GeminiTrader:
         time_since_start = current_time - self.cycle_start_time
 
         return (
-            self.config[constants.CYCLE_TIME] - time_since_start.total_seconds()
+            self.config.get(constants.CYCLE_TIME) - time_since_start.total_seconds()
         )
 

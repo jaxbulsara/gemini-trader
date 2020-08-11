@@ -42,8 +42,8 @@ class OptimalStopping(Strategy):
                 self.initialize()
 
     def optimal_stopping(self):
-        action = self.trader.config[constants.ACTION]
-        bitcoin_price = self.trader.bitcoin_quote[constants.PRICE]
+        action = self.trader.config.get(constants.ACTION)
+        bitcoin_price = self.trader.bitcoin_quote.get(constants.PRICE)
 
         if self.trader.cycle_start_time < self.switch_time:
             self.trader.fetch_bitcoin_quote()
@@ -89,7 +89,7 @@ class OptimalStopping(Strategy):
                 self.initialize()
 
     def set_price_to_beat(self):
-        bitcoin_price = self.trader.bitcoin_quote[constants.PRICE]
+        bitcoin_price = self.trader.bitcoin_quote.get(constants.PRICE)
         self.price_to_beat = bitcoin_price
         log.info(f"Set new price to beat = {self.price_to_beat}")
 
@@ -106,23 +106,23 @@ class OptimalStopping(Strategy):
         log.info(f"Set start time = {self.start_time}")
 
     def set_switch_time(self):
-        period = self.trader.config[constants.PERIOD]
+        period = self.trader.config.get(constants.PERIOD)
         self.switch_time = self.start_time + period * STOPPING_FACTOR
         log.info(f"Set switch time = {self.switch_time}")
 
     def set_end_time(self):
-        period = self.trader.config[constants.PERIOD]
+        period = self.trader.config.get(constants.PERIOD)
         self.end_time = self.start_time + period
         log.info(f"Set end time = {self.end_time}")
 
     def calculate_amount(self):
         self.trader.fetch_account_balances()
 
-        action = self.trader.config[constants.ACTION]
-        amount = float(self.trader.config[constants.AMOUNT])
-        stop_amount = float(self.trader.config[constants.STOP])
-        usd_balance = self.trader.account_balances[constants.USD]
-        btc_balance = self.trader.account_balances[constants.BTC]
+        action = self.trader.config.get(constants.ACTION)
+        amount = float(self.trader.config.get(constants.AMOUNT))
+        stop_amount = float(self.trader.config.get(constants.STOP))
+        usd_balance = self.trader.account_balances.get(constants.USD, 0)
+        btc_balance = self.trader.account_balances.get(constants.BTC, 0)
 
         if action == constants.BUY:
             balance = usd_balance
@@ -140,8 +140,8 @@ class OptimalStopping(Strategy):
             log.info(f"Set amount to sell = {self.amount} {constants.BTC}")
 
     def compare_price(self):
-        bitcoin_price = self.trader.bitcoin_quote[constants.PRICE]
-        action = self.trader.config[constants.ACTION]
+        bitcoin_price = self.trader.bitcoin_quote.get(constants.PRICE)
+        action = self.trader.config.get(constants.ACTION)
         if action == constants.BUY:
             return bitcoin_price < self.price_to_beat
 
@@ -149,6 +149,6 @@ class OptimalStopping(Strategy):
             return bitcoin_price > self.price_to_beat
 
     def create_bitcoin_amount(self):
-        bitcoin_price = self.trader.bitcoin_quote[constants.PRICE]
+        bitcoin_price = self.trader.bitcoin_quote.get(constants.PRICE)
         return round((self.amount / bitcoin_price), 8)
 
