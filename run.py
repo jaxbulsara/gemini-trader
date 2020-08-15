@@ -1,12 +1,17 @@
 # built-in
+import sys
 from datetime import datetime
 
 # package
 from setup_logging import setup_logging
 
 if __name__ == "__main__":
-    start_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
-    setup_logging(start_datetime)
+    try:
+        debug_mode = sys.argv[1]
+    except IndexError:
+        debug_mode = False
+
+    setup_logging(debug=debug_mode)
 
     from GeminiTrader import GeminiTrader
 
