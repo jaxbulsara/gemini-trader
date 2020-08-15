@@ -189,8 +189,9 @@ class GeminiTrader:
         current_time = datetime.now()
         time_since_start = current_time - self.cycle_start_time
 
-        return (
+        return max(
             self.config.get(constants.CYCLE_TIME)
-            - time_since_start.total_seconds()
+            - time_since_start.total_seconds(),
+            0,
         )
 
