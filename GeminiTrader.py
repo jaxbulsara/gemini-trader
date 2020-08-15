@@ -28,11 +28,7 @@ class GeminiTrader:
 
     def run(self):
         self.login()
-
-        self.read_configuration()
-        self.fetch_account_balances()
-        self.fetch_bitcoin_quote()
-        self.create_strategy()
+        self.setup()
 
         while True:
             try:
@@ -71,6 +67,25 @@ class GeminiTrader:
                 log.debug(f"Logged in to gemini at url={self.gemini.base_url}")
                 # log.debug(f"{self.gemini.api_key=}")
                 # log.debug(f"{self.gemini.secret_key=}")
+
+    def setup(self):
+        while True:
+            try:
+                self.read_configuration()
+                self.fetch_account_balances()
+                self.fetch_bitcoin_quote()
+                self.create_strategy()
+                break
+
+            except requests.exceptions.ConnectionError:
+                log.error(
+                    f"Connection failed. Retrying in {self.retry_time}s..."
+                )
+                time.sleep(self.retry_time)
+                self.backoff_retry_time()
+
+            else:
+                self.reset_retry_time()
 
     def read_configuration(self):
         def convert_period():
