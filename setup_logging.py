@@ -12,12 +12,9 @@ from logging.handlers import RotatingFileHandler
 def setup_logging(debug=False):
     NAME = "gemini-trader"
     FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-    VERBOSE_FORMAT = (
-        "(%(name)s) %(asctime)s %(module)s %(levelname)s: %(message)s"
-    )
     FILENAME = f"logs/gemini-trader.log"
     VERBOSE_FILE = f"logs/verbose_gemini-trader.log"
-    MAX_BYTES =  500 * 1024
+    MAX_BYTES = 500 * 1024
     BACKUP_COUNT = 5
 
     def create_logs_directory():
