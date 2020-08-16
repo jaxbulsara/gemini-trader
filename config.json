@@ -1,8 +1,8 @@
 {
     "strategy": "OPTIMAL_STOPPING",
     "action": "BUY",
-    "period": 14400,
-    "cycle_time": 60,
-    "amount_to_buy": 20,
+    "period": 72000,
+    "cycle_time": 300,
+    "amount_to_buy": 100,
     "stop_amount": 0
 }

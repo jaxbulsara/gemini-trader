@@ -17,7 +17,7 @@ def setup_logging(debug=False):
     )
     FILENAME = f"logs/gemini-trader.log"
     VERBOSE_FILE = f"logs/verbose_gemini-trader.log"
-    MAX_BYTES = 10 * 1024 * 1024
+    MAX_BYTES =  500 * 1024
     BACKUP_COUNT = 5
 
     def create_logs_directory():
@@ -44,7 +44,7 @@ def setup_logging(debug=False):
         logger.addHandler(log_file_handler)
 
     def setup_verbose_file_handler():
-        verbose_log_formatter = Formatter(VERBOSE_FORMAT)
+        verbose_log_formatter = Formatter(FORMAT)
         verbose_log_file_handler = RotatingFileHandler(
             VERBOSE_FILE, maxBytes=MAX_BYTES, backupCount=BACKUP_COUNT
         )

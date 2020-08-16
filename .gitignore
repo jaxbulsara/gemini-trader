@@ -144,3 +144,4 @@ cython_debug/
 old*
 keys*
 logs/
+error.txt
