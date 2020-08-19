@@ -89,8 +89,14 @@ class OptimalStopping(Strategy):
                 self.initialize()
 
     def set_price_to_beat(self):
+        max_price = self.trader.config.get(
+            constants.MAX_PRICE, 1000 * 1000 * 1000
+        )
+        min_price = self.trader.config.get(constants.MIN_PRICE, 0)
         bitcoin_price = self.trader.bitcoin_quote.get(constants.PRICE)
-        self.price_to_beat = bitcoin_price
+
+        self.price_to_beat = min(max(bitcoin_price, min_price), max_price)
+
         log.info(f"Set new price to beat = {self.price_to_beat}")
 
     def reset_price_to_beat(self):
