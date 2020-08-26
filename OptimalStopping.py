@@ -74,8 +74,8 @@ class OptimalStopping(Strategy):
                     )
 
                     order = self.trader.gemini.new_order(
-                        amount=f"{bitcoin_amount}",
-                        price=f"{bitcoin_price}",
+                        amount=str(bitcoin_amount),
+                        price=str(bitcoin_price),
                         side=action.lower(),
                     )
 
