@@ -194,8 +194,8 @@ class GeminiTrader:
 
     def backoff_retry_time(self):
         self.retry_time *= 2
-        if self.retry_time > 300:
-            self.retry_time = 2
+        if self.retry_time > constants.MAX_RETRY_TIME:
+            self.reset_retry_time()
 
     def reset_retry_time(self):
         self.retry_time = 2

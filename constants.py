@@ -20,3 +20,5 @@ BTC = "BTC"
 ASK = "ask"
 BID = "bid"
 PRICE = "price"
+
+MAX_RETRY_TIME = 1025
