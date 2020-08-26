@@ -3,8 +3,6 @@
     "action": "BUY",
     "period": 72000,
     "cycle_time": 5,
-    "amount_to_buy": 20,
-    "stop_amount": 0,
-    "max_price": 1000000000,
-    "min_price": 0
+    "amount_to_buy": 100,
+    "stop_amount": 0
 }
