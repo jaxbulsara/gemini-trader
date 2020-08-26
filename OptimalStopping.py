@@ -56,34 +56,33 @@ class OptimalStopping(Strategy):
                 log.debug(f"\tPrice to beat: {self.price_to_beat}")
 
         else:
-            if self.price_to_beat:
-                self.trader.fetch_bitcoin_quote()
+            self.trader.fetch_bitcoin_quote()
 
-                log.debug("READY TO LEAP:")
-                log.debug(f"\tCurrent price: {bitcoin_price}")
-                log.debug(f"\tPrice to beat: {self.price_to_beat}")
+            log.debug("READY TO LEAP:")
+            log.debug(f"\tCurrent price: {bitcoin_price}")
+            log.debug(f"\tPrice to beat: {self.price_to_beat}")
 
-                if self.compare_price():
-                    if action == constants.BUY:
-                        bitcoin_amount = self.create_bitcoin_amount()
-                    else:
-                        bitcoin_amount = self.amount
+            if self.compare_price():
+                if action == constants.BUY:
+                    bitcoin_amount = self.create_bitcoin_amount()
+                else:
+                    bitcoin_amount = self.amount
 
-                    log.info(
-                        f"Placing order to {action} {bitcoin_amount:.8f} BTC at {(bitcoin_price):.2f} USD"
-                    )
+                log.info(
+                    f"Placing order to {action} {bitcoin_amount:.8f} BTC at {(bitcoin_price):.2f} USD"
+                )
 
-                    order = self.trader.gemini.new_order(
-                        amount=str(bitcoin_amount),
-                        price=str(bitcoin_price),
-                        side=action.lower(),
-                    )
+                order = self.trader.gemini.new_order(
+                    amount=str(bitcoin_amount),
+                    price=str(bitcoin_price),
+                    side=action.lower(),
+                )
 
-                    log.debug(f"Created new order: {order.json()}")
+                log.debug(f"Created new order: {order.json()}")
 
-                    self.initialize()
+                self.initialize()
 
-            if self.trader.cycle_start_time > self.end_time:
+            elif self.trader.cycle_start_time > self.end_time:
                 self.initialize()
 
     def set_price_to_beat(self):
