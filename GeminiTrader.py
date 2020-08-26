@@ -75,7 +75,6 @@ class GeminiTrader:
                 self.fetch_account_balances()
                 self.fetch_bitcoin_quote()
                 self.create_strategy()
-                break
 
             except requests.exceptions.ConnectionError:
                 log.error(
@@ -86,6 +85,7 @@ class GeminiTrader:
 
             else:
                 self.reset_retry_time()
+                break
 
     def read_configuration(self):
         def convert_period():
