@@ -81,9 +81,7 @@ class OptimalStopping(Strategy):
 
                     log.debug(f"Created new order: {order.json()}")
 
-                    self.reset_price_to_beat()
-
-                    log.info("Waiting for next trading window...")
+                    self.initialize()
 
             if self.trader.cycle_start_time > self.end_time:
                 self.initialize()
@@ -98,10 +96,6 @@ class OptimalStopping(Strategy):
         self.price_to_beat = min(max(bitcoin_price, min_price), max_price)
 
         log.info(f"Set new price to beat = {self.price_to_beat}")
-
-    def reset_price_to_beat(self):
-        self.price_to_beat = None
-        log.debug(f"Reset price to beat.")
 
     def set_start_time(self):
         if self.end_time:
