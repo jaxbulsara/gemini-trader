@@ -97,10 +97,7 @@ class OptimalStopping(Strategy):
         log.info(f"Set new price to beat = {self.price_to_beat}")
 
     def set_start_time(self):
-        if self.end_time:
-            self.start_time = self.end_time
-        else:
-            self.start_time = self.trader.cycle_start_time
+        self.start_time = self.trader.cycle_start_time
 
         log.info(f"Set start time = {self.start_time}")
 
